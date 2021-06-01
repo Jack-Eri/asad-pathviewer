@@ -1,0 +1,15 @@
+from maven:3-openjdk-8 as build
+
+WORKDIR /app
+COPY . .
+RUN mvn package && mv target/*.jar target/app.jar
+
+from openjdk:8
+
+WORKDIR /usr/src
+COPY --from=build /app/target/app.jar app.jar
+COPY --from=build /app/wait-for-it.sh wait-for-it.sh
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "app.jar"]

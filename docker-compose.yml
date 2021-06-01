@@ -1,0 +1,46 @@
+version: "3"
+services:
+  reverse-proxy:
+    image: traefik:v2.4.8
+    command: --api.insecure=true --providers.docker
+    ports:
+      - 80:80
+      - 8080:8080
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+
+  asad-data:
+    build: ./asad-data/
+    restart: always
+    environment:
+      ASAD_COMPUTATION_URL: http://reverse-proxy/computation
+      SPRING_DATA_MONGODB_HOST: asad-mongo
+      SPRING_DATA_MONGODB_PORT: 27017
+    command: "/usr/src/wait-for-it.sh -h asad-mongo -p 27017 -s -t 0 -- java -jar /usr/src/app.jar"
+    labels:
+      - "traefik.http.middlewares.asad-data-stripprefix.stripprefix.prefixes=/data"
+      - "traefik.http.routers.asad-data-router.rule=PathPrefix(`/data`)"
+      - "traefik.http.routers.asad-data-router.middlewares=asad-data-stripprefix"
+      - "traefik.http.services.asad-data-service.loadBalancer.healthCheck.path=/health"
+      - "traefik.http.services.asad-data-service.loadBalancer.healthCheck.interval=10s"
+      - "traefik.http.services.asad-data-service.loadBalancer.healthCheck.timeout=3s"
+
+  asad-computation:
+    build: ./asad-computation/
+    restart: always
+    labels:
+      - "traefik.http.middlewares.asad-computation-stripprefix.stripprefix.prefixes=/computation"
+      - "traefik.http.routers.asad-computation-router.rule=PathPrefix(`/computation`)"
+      - "traefik.http.routers.asad-computation-router.middlewares=asad-computation-stripprefix"
+      - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.path=/health"
+      - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.interval=10s"
+      - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.timeout=3s"
+
+  asad-mongo:
+    image: mongo:4.4.1
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27018:27017
