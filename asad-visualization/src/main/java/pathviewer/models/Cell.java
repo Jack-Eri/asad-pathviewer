@@ -1,13 +1,17 @@
 package pathviewer.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cell {
     @JsonProperty
+    @Getter
     private Position position;
 
     @JsonProperty
@@ -32,11 +36,6 @@ public class Cell {
     }
 
     @JsonIgnore
-    public Position getPosition() {
-        return position;
-    }
-
-    @JsonIgnore
     public boolean isField() {
         return field != null;
     }
@@ -51,6 +50,7 @@ public class Cell {
         this.field = field;
     }
 
+    @JsonGetter
     public int getCost() {
         if (field == null) {
             return cost;
@@ -65,12 +65,8 @@ public class Cell {
         return pathCost;
     }
 
-    public boolean setCost(int cost) {
-        if (field == null) {
-            this.cost = cost;
-            return true;
-        }
-
-        return false;
+    @JsonSetter
+    public void setCost(int cost) {
+        this.cost = Math.max(1, Math.min(cost, 99));
     }
 }

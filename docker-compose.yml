@@ -13,7 +13,7 @@ services:
     build: ./asad-data/
     restart: always
     environment:
-      ASAD_COMPUTATION_URL: http://reverse-proxy/computation
+      ASAD_COMPUTATION_URL: http://asad-computation:8080
       SPRING_DATA_MONGODB_HOST: asad-mongo
       SPRING_DATA_MONGODB_PORT: 27017
     command: "/usr/src/wait-for-it.sh -h asad-mongo -p 27017 -s -t 0 -- java -jar /usr/src/app.jar"
@@ -35,6 +35,8 @@ services:
       - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.path=/health"
       - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.interval=10s"
       - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.timeout=3s"
+    # ports:
+    #   - 8081:8080
 
   asad-mongo:
     image: mongo:4.4.1

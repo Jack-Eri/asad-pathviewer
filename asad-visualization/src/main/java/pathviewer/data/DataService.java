@@ -16,7 +16,7 @@ import java.util.List;
 
 public class DataService {
 
-    private static final String BASE_PATH = "http://localhost:8080";
+    private static final String BASE_PATH = "http://localhost/data";
     private static final Duration TIMEOUT = Duration.ofSeconds(2);
 
     private final HttpClient client;
@@ -45,9 +45,9 @@ public class DataService {
     }
 
     public Field createField(String identifier, int width, int height) {
-        HttpRequest request = post(
+        HttpRequest request = put(
                 String.format("/fields?identifier=%s&width=%d&height=%d", identifier, width, height),
-                HttpRequest.BodyPublishers.noBody()
+                HttpRequest.BodyPublishers.ofString("\"\"")
         );
 
         try {

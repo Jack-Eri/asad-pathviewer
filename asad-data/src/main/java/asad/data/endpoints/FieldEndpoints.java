@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping(value = "/fields", produces = "application/json", consumes = "application/json")
+@RequestMapping(produces = "application/json", consumes = "application/json")
 public class FieldEndpoints {
 
     private final FieldService fieldService;
@@ -18,9 +18,12 @@ public class FieldEndpoints {
         this.fieldService = fieldService;
     }
 
-    @PostMapping()
+    @PutMapping("/fields")
     public ResponseEntity<?> createField(
-            @RequestParam String identifier, @RequestParam int width, @RequestParam int height
+            @RequestParam String identifier,
+            @RequestParam int width,
+            @RequestParam int height,
+            @RequestBody String body
     ) {
         if (identifier == null || identifier.isEmpty() || width <= 0 || height <= 0) {
             return ResponseEntity.badRequest().build();
@@ -32,7 +35,7 @@ public class FieldEndpoints {
         return ResponseEntity.ok(field);
     }
 
-    @GetMapping("/{identifier}")
+    @GetMapping("/fields/{identifier}")
     public ResponseEntity<?> getField(
             @PathVariable String identifier
     ) {
@@ -44,7 +47,7 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/{identifier}")
+    @PostMapping("/fields/{identifier}")
     public ResponseEntity<?> updateField(
             @PathVariable String identifier, @RequestBody Field field
     ) {
@@ -56,7 +59,7 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{identifier}")
+    @DeleteMapping("/fields/{identifier}")
     public ResponseEntity<?> deleteField(
             @PathVariable String identifier
     ) {
@@ -64,7 +67,7 @@ public class FieldEndpoints {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{identifier}/costs")
+    @PutMapping("/fields/{identifier}/costs")
     public ResponseEntity<?> updateCost(
             @PathVariable String identifier,
             @RequestBody Command<Integer> command
@@ -78,7 +81,7 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{identifier}/starts")
+    @PutMapping("/fields/{identifier}/starts")
     public ResponseEntity<?> updateStart(
             @PathVariable String identifier,
             @RequestBody Command<Position> command
@@ -91,7 +94,7 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{identifier}/ends")
+    @PutMapping("/fields/{identifier}/ends")
     public ResponseEntity<?> updateEnd(
             @PathVariable String identifier,
             @RequestBody Command<Position> command
@@ -104,7 +107,7 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{identifier}/cellToField")
+    @PutMapping("/fields/{identifier}/cellToField")
     public ResponseEntity<?> changeCellToField(
             @PathVariable String identifier,
             @RequestBody Command<Field> command
@@ -117,7 +120,7 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{identifier}/fieldToCell")
+    @PutMapping("/fields/{identifier}/fieldToCell")
     public ResponseEntity<?> changeFieldToCell(
             @PathVariable String identifier,
             @RequestBody Command<Integer> command

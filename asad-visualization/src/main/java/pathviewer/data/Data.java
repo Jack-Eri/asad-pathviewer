@@ -31,7 +31,6 @@ public class Data {
 
     public Data() {
         dataService = new DataService();
-        error = "Bonjour patrick";
     }
 
     public boolean hasField() {

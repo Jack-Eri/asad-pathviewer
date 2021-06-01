@@ -49,11 +49,6 @@ public class Field {
     }
 
     @JsonIgnore
-    public boolean setCost(Position position, int cost) {
-        return this.cells[position.getX()][position.getY()].setCost(cost);
-    }
-
-    @JsonIgnore
     public Cell getCell(Position position) {
         return cells[position.getX()][position.getY()];
     }

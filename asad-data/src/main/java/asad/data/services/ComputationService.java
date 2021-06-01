@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 @Service
@@ -28,10 +30,10 @@ public class ComputationService {
         objectMapper = new ObjectMapper();
     }
 
-    public Field computePaths(Command<?> command) {
+    public Field computePaths(Command<Field> command) {
         try {
             String body = objectMapper.writeValueAsString(command);
-            HttpRequest request = put("/compute", HttpRequest.BodyPublishers.ofString(body));
+            HttpRequest request = put("/compute", HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
@@ -66,7 +68,7 @@ public class ComputationService {
         return HttpRequest.newBuilder()
                 .timeout(TIMEOUT)
                 .uri(URI.create(BASE_PATH + path))
-                .header("Content-Type", "application/json")
+                .header("Content-Type", "application/json; charset=utf-8")
                 .timeout(TIMEOUT);
     }
 }
