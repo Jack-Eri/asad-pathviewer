@@ -18,18 +18,18 @@ public class FieldEndpoints {
         this.fieldService = fieldService;
     }
 
-    @PutMapping("/fields")
+    @GetMapping("/fields")
     public ResponseEntity<?> createField(
             @RequestParam String identifier,
             @RequestParam int width,
             @RequestParam int height,
-            @RequestBody String body
+            @RequestParam(defaultValue = "ASTAR") String algorithm
     ) {
         if (identifier == null || identifier.isEmpty() || width <= 0 || height <= 0) {
             return ResponseEntity.badRequest().build();
         }
 
-        Field field = fieldService.createField(identifier, width, height);
+        Field field = fieldService.createField(identifier, width, height, algorithm);
         if (field == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(field);
@@ -47,18 +47,6 @@ public class FieldEndpoints {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/fields/{identifier}")
-    public ResponseEntity<?> updateField(
-            @PathVariable String identifier, @RequestBody Field field
-    ) {
-        Field updatedField = fieldService.updateField(identifier, field);
-        if (updatedField != null) {
-            return ResponseEntity.ok(updatedField);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
     @DeleteMapping("/fields/{identifier}")
     public ResponseEntity<?> deleteField(
             @PathVariable String identifier
@@ -70,10 +58,11 @@ public class FieldEndpoints {
     @PutMapping("/fields/{identifier}/costs")
     public ResponseEntity<?> updateCost(
             @PathVariable String identifier,
-            @RequestBody Command<Integer> command
+            @RequestBody Command<Integer> command,
+            @RequestParam(defaultValue = "ASTAR") String algorithm
     ) {
         int cost = command.getData() != null ? command.getData() : 1;
-        Field field = fieldService.updateCost(identifier, command.getPositions(), cost);
+        Field field = fieldService.updateCost(identifier, command.getPositions(), cost, algorithm);
         if (field != null) {
             return ResponseEntity.ok(field);
         }
@@ -84,9 +73,10 @@ public class FieldEndpoints {
     @PutMapping("/fields/{identifier}/starts")
     public ResponseEntity<?> updateStart(
             @PathVariable String identifier,
-            @RequestBody Command<Position> command
+            @RequestBody Command<Position> command,
+            @RequestParam(defaultValue = "ASTAR") String algorithm
     ) {
-        Field field = fieldService.updateStart(identifier, command.getPositions(), command.getData());
+        Field field = fieldService.updateStart(identifier, command.getPositions(), command.getData(), algorithm);
         if (field != null) {
             return ResponseEntity.ok(field);
         }
@@ -97,9 +87,10 @@ public class FieldEndpoints {
     @PutMapping("/fields/{identifier}/ends")
     public ResponseEntity<?> updateEnd(
             @PathVariable String identifier,
-            @RequestBody Command<Position> command
+            @RequestBody Command<Position> command,
+            @RequestParam(defaultValue = "ASTAR") String algorithm
     ) {
-        Field field = fieldService.updateEnd(identifier, command.getPositions(), command.getData());
+        Field field = fieldService.updateEnd(identifier, command.getPositions(), command.getData(), algorithm);
         if (field != null) {
             return ResponseEntity.ok(field);
         }
@@ -110,9 +101,10 @@ public class FieldEndpoints {
     @PutMapping("/fields/{identifier}/cellToField")
     public ResponseEntity<?> changeCellToField(
             @PathVariable String identifier,
-            @RequestBody Command<Field> command
+            @RequestBody Command<Field> command,
+            @RequestParam(defaultValue = "ASTAR") String algorithm
     ) {
-        Field field = fieldService.changeCellToField(identifier, command.getPositions(), command.getData());
+        Field field = fieldService.changeCellToField(identifier, command.getPositions(), command.getData(), algorithm);
         if (field != null) {
             return ResponseEntity.ok(field);
         }
@@ -123,10 +115,11 @@ public class FieldEndpoints {
     @PutMapping("/fields/{identifier}/fieldToCell")
     public ResponseEntity<?> changeFieldToCell(
             @PathVariable String identifier,
-            @RequestBody Command<Integer> command
+            @RequestBody Command<Integer> command,
+            @RequestParam(defaultValue = "ASTAR") String algorithm
     ) {
         int cost = command.getData() != null ? command.getData() : 1;
-        Field field = fieldService.changeFieldToCell(identifier, command.getPositions(), cost);
+        Field field = fieldService.changeFieldToCell(identifier, command.getPositions(), cost, algorithm);
         if (field != null) {
             return ResponseEntity.ok(field);
         }

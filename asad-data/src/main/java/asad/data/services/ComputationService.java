@@ -30,10 +30,13 @@ public class ComputationService {
         objectMapper = new ObjectMapper();
     }
 
-    public Field computePaths(Command<Field> command) {
+    public Field computePaths(Command<Field> command, String algorithm) {
         try {
             String body = objectMapper.writeValueAsString(command);
-            HttpRequest request = put("/compute", HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
+            HttpRequest request = put(
+                    String.format("/compute?algorithm=%s", algorithm),
+                    HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8)
+            );
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {

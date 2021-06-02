@@ -19,6 +19,9 @@ public class Data {
     @Getter
     private String identifier = "jack";
 
+    @Getter  @Setter
+    private String algorithm = "ASTAR";
+
     @Getter
     private String error;
 
@@ -54,7 +57,7 @@ public class Data {
     public void createField(String identifier, int width, int height) {
         String oldIdentifier = this.identifier;
         if (setIdentifier(identifier)) {
-            this.field = dataService.createField(identifier, width, height);
+            this.field = dataService.createField(identifier, width, height, algorithm);
             if (field == null) {
                 error = String.format("Failed creating field %s!", identifier);
                 this.identifier = oldIdentifier;
@@ -121,7 +124,7 @@ public class Data {
         List<Position> positions = new LinkedList<>(currentPosition);
         positions.add(position);
 
-        if (refreshField(dataService.updateCost(identifier, positions, cost))) {
+        if (refreshField(dataService.updateCost(identifier, positions, cost, algorithm))) {
             error = null;
         } else {
             error = "Failed updating cost!";
@@ -129,7 +132,7 @@ public class Data {
     }
 
     public void setStart(Position position) {
-        if (refreshField(dataService.updateStart(identifier, currentPosition, position))) {
+        if (refreshField(dataService.updateStart(identifier, currentPosition, position, algorithm))) {
             error = null;
         } else {
             error = "Failed updating start!";
@@ -137,7 +140,7 @@ public class Data {
     }
 
     public void setEnd(Position position) {
-        if (refreshField(dataService.updateEnd(identifier, currentPosition, position))) {
+        if (refreshField(dataService.updateEnd(identifier, currentPosition, position, algorithm))) {
             error = null;
         } else {
             error = "Failed updating end!";
@@ -148,7 +151,7 @@ public class Data {
         List<Position> positions = new LinkedList<>(currentPosition);
         positions.add(position);
 
-        if (refreshField(dataService.changeCellToField(identifier, positions, width, height))) {
+        if (refreshField(dataService.changeCellToField(identifier, positions, width, height, algorithm))) {
             error = null;
         } else {
             error = "Failed changing to field!";
@@ -159,7 +162,7 @@ public class Data {
         List<Position> positions = new LinkedList<>(currentPosition);
         positions.add(position);
 
-        if (refreshField(dataService.changeFieldToCell(identifier, positions))) {
+        if (refreshField(dataService.changeFieldToCell(identifier, positions, algorithm))) {
             error = null;
         } else {
             error = "Failed cahnging to cell!";

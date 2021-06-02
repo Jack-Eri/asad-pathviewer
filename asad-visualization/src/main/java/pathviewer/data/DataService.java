@@ -16,7 +16,7 @@ import java.util.List;
 
 public class DataService {
 
-    private static final String BASE_PATH = "http://localhost/data";
+    private static final String BASE_PATH = "http://localhost:8080/data";
     private static final Duration TIMEOUT = Duration.ofSeconds(2);
 
     private final HttpClient client;
@@ -44,10 +44,10 @@ public class DataService {
         return null;
     }
 
-    public Field createField(String identifier, int width, int height) {
-        HttpRequest request = put(
-                String.format("/fields?identifier=%s&width=%d&height=%d", identifier, width, height),
-                HttpRequest.BodyPublishers.ofString("\"\"")
+    public Field createField(String identifier, int width, int height, String algorithm) {
+        String str = "body";
+        HttpRequest request = get(
+                String.format("/fields?identifier=%s&width=%d&height=%d&algorithm=%s", identifier, width, height, algorithm)
         );
 
         try {
@@ -76,46 +76,28 @@ public class DataService {
         }
     }
 
-    public void updateField(String identifier, Field field) {
-        try {
-            String body = new ObjectMapper().writeValueAsString(field);
-
-            HttpRequest request = post(
-                    String.format("/fields/%s", identifier),
-                    HttpRequest.BodyPublishers.ofString(body)
-            );
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            System.out.printf("%s -> %s\n", response.statusCode(), response.body());
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+    public Field updateCost(String identifier, List<Position> positions, int cost, String algorithm) {
+        return update(String.format("/fields/%s/costs?algorithm=%s", identifier, algorithm), new Command<>(positions, cost));
     }
 
-    public Field updateCost(String identifier, List<Position> positions, int cost) {
-        return update(String.format("/fields/%s/costs", identifier), new Command<>(positions, cost));
+    public Field updateStart(String identifier, List<Position> positions, Position start, String algorithm) {
+        return update(String.format("/fields/%s/starts?algorithm=%s", identifier, algorithm), new Command<>(positions, start));
     }
 
-    public Field updateStart(String identifier, List<Position> positions, Position start) {
-        return update(String.format("/fields/%s/starts", identifier), new Command<>(positions, start));
+    public Field updateEnd(String identifier, List<Position> positions, Position end, String algorithm) {
+        return update(String.format("/fields/%s/ends?algorithm=%s", identifier, algorithm), new Command<>(positions, end));
     }
 
-    public Field updateEnd(String identifier, List<Position> positions, Position end) {
-        return update(String.format("/fields/%s/ends", identifier), new Command<>(positions, end));
-    }
-
-    public Field changeCellToField(String identifier, List<Position> positions, int width, int height) {
+    public Field changeCellToField(String identifier, List<Position> positions, int width, int height, String algorithm) {
         return update(
-                String.format("/fields/%s/cellToField", identifier),
+                String.format("/fields/%s/cellToField?algorithm=%s", identifier, algorithm),
                 new Command<>(positions, new Field(width, height))
         );
     }
 
-    public Field changeFieldToCell(String identifier, List<Position> positions) {
+    public Field changeFieldToCell(String identifier, List<Position> positions, String algorithm) {
         return update(
-                String.format("/fields/%s/fieldToCell", identifier),
+                String.format("/fields/%s/fieldToCell?algorithm=%s", identifier, algorithm),
                 new Command<>(positions, null)
         );
     }

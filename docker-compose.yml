@@ -2,10 +2,10 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.4.8
-    command: --api.insecure=true --providers.docker
+    command: --api.insecure=false --providers.docker
     ports:
-      - 80:80
-      - 8080:8080
+      - 8080:80
+      # - 8080:8080
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock
 
@@ -35,8 +35,6 @@ services:
       - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.path=/health"
       - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.interval=10s"
       - "traefik.http.services.asad-computation-service.loadBalancer.healthCheck.timeout=3s"
-    # ports:
-    #   - 8081:8080
 
   asad-mongo:
     image: mongo:4.4.1
@@ -44,5 +42,5 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - 27018:27017
+    # ports:
+    #   - 27017:27017

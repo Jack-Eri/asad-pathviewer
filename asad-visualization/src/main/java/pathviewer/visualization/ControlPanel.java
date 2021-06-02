@@ -14,8 +14,10 @@ public class ControlPanel extends JPanel
 {
     private final Data data;
     private SelectionType selectionType;
+    private String algorithm;
     
     private JComboBox<String> selector;
+    private JComboBox<String> algorithmSelector;
     private JSpinner spinnerWidth;
     private JSpinner spinnerHeight;
     private JTextField identifierField;
@@ -98,6 +100,24 @@ public class ControlPanel extends JPanel
         add(createButton);
         add(loadButton);
         add(deleteButton);
+
+        // Algorithm selector
+        Label algorithmLabel = new Label("Algorithm Selection");
+        algorithmLabel.setBounds(10, 460, width - 20, 30);
+        add(algorithmLabel);
+
+        algorithmSelector = new JComboBox<>();
+
+        algorithmSelector.addItem("ASTAR");
+        algorithmSelector.addItem("ASTAR_DIAG");
+        algorithmSelector.setBounds(10, 490, width - 20, 30);
+
+        algorithmSelector.addActionListener((ActionEvent e) -> {
+            data.setAlgorithm((String) algorithmSelector.getSelectedItem());
+            System.out.println(data.getAlgorithm());
+        });
+
+        add(algorithmSelector);
     }
     
     public int GetFieldWidth()

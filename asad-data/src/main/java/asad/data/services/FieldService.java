@@ -29,10 +29,10 @@ public class FieldService {
         return documents.isEmpty() ? null : documents.get(0).getField();
     }
 
-    public Field createField(String identifier, int width, int height) {
+    public Field createField(String identifier, int width, int height, String algorithm) {
         Field field =  new Field(width, height);
 
-        field = computationService.computePaths(new Command<>(new LinkedList<>(), field));
+        field = computationService.computePaths(new Command<>(new LinkedList<>(), field), algorithm);
         if (field == null) return null;
 
         FieldDocument document = new FieldDocument(identifier, field);
@@ -57,7 +57,7 @@ public class FieldService {
         mongoTemplate.remove(Query.query(Criteria.where("identifier").is(identifier)), FieldDocument.class);
     }
 
-    public Field updateCost(String identifier, List<Position> positions, int cost) {
+    public Field updateCost(String identifier, List<Position> positions, int cost, String algorithm) {
         if (positions.isEmpty()) return null;
 
         // Retrieve field from db
@@ -79,14 +79,14 @@ public class FieldService {
         cell.setCost(Math.max(1, Math.min(cost, 99)));
 
         // Update paths
-        root = updatePaths(root, positions, true);
+        root = updatePaths(root, positions, true, algorithm);
         if (root == null) return null;
 
         // Update field in db
         return updateField(identifier, root);
     }
 
-    public Field updateStart(String identifier, List<Position> positions, Position start) {
+    public Field updateStart(String identifier, List<Position> positions, Position start, String algorithm) {
         // Retrieve field from db
         Field root = getField(identifier);
         if (root == null) return null;
@@ -99,13 +99,13 @@ public class FieldService {
         field.setStart(start);
 
         // Update paths
-        root = updatePaths(root, positions, false);
+        root = updatePaths(root, positions, false, algorithm);
         if (root == null) return null;
 
         return updateField(identifier, root);
     }
 
-    public Field updateEnd(String identifier, List<Position> positions, Position end) {
+    public Field updateEnd(String identifier, List<Position> positions, Position end, String algorithm) {
         // Retrieve field from db
         Field root = getField(identifier);
         if (root == null) return null;
@@ -118,13 +118,13 @@ public class FieldService {
         field.setEnd(end);
 
         // Update paths
-        root = updatePaths(root, positions, false);
+        root = updatePaths(root, positions, false, algorithm);
         if (root == null) return null;
 
         return updateField(identifier, root);
     }
 
-    public Field changeCellToField(String identifier, List<Position> positions, Field newField) {
+    public Field changeCellToField(String identifier, List<Position> positions, Field newField, String algorithm) {
         if (positions.isEmpty()) return null;
 
         // Retrieve field from db
@@ -147,14 +147,14 @@ public class FieldService {
         cell.setField(newField);
 
         // Update paths
-        root = updatePaths(root, positions, false);
+        root = updatePaths(root, positions, false, algorithm);
         if (root == null) return null;
 
         // Update field in db
         return updateField(identifier, root);
     }
 
-    public Field changeFieldToCell(String identifier, List<Position> positions, int cost) {
+    public Field changeFieldToCell(String identifier, List<Position> positions, int cost, String algorithm) {
         if (positions.isEmpty()) return null;
 
         // Retrieve field from db
@@ -177,20 +177,20 @@ public class FieldService {
         cell.setCost(cost);
 
         // Update paths
-        root = updatePaths(root, positions, true);
+        root = updatePaths(root, positions, true, algorithm);
         if (root == null) return null;
 
         // Update field in db
         return updateField(identifier, root);
     }
 
-    private Field updatePaths(Field field, List<Position> positions, boolean ignoreLast) {
+    private Field updatePaths(Field field, List<Position> positions, boolean ignoreLast, String algorithm) {
         List<Position> fieldPosition = new LinkedList<>(positions);
         if (ignoreLast) {
             fieldPosition.remove(fieldPosition.size() - 1);
         }
 
-        return computationService.computePaths(new Command<>(fieldPosition, field));
+        return computationService.computePaths(new Command<>(fieldPosition, field), algorithm);
     }
 
     private Field getFieldAt(List<Position> positions, Field field, boolean ignoreLast) {

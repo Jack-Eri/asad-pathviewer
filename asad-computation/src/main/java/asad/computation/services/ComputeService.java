@@ -1,6 +1,5 @@
 package asad.computation.services;
 
-import asad.computation.algorithms.Astar;
 import asad.computation.algorithms.PathFinding;
 import asad.computation.models.Cell;
 import asad.computation.models.Field;
@@ -15,10 +14,10 @@ import java.util.Stack;
 @AllArgsConstructor
 public class ComputeService {
 
-    private final Astar astar;
+    private final AlgorithmSelectionService algorithmSelectionService;
 
-    public Field computePaths(Field field, List<Position> positions) {
-        return computePaths(field, positions, astar);
+    public Field computePaths(Field field, List<Position> positions, String algorithm) {
+        return computePaths(field, positions, algorithmSelectionService.getAlgorithm(algorithm));
     }
 
     private Field computePaths(Field root, List<Position> positions, PathFinding pathFinding) {
